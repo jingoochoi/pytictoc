@@ -1,5 +1,6 @@
 import tkinter as tk
-def oo(ko):ko.config(text='o')
+import tkinter.messagebox as mbox
+import random
 window=tk.Tk()
 window.title('tictoctoe')
 window.geometry('264x282')
@@ -11,31 +12,44 @@ screen_height = window.winfo_screenheight()
 x_position = (screen_width - window_width) // 2
 y_position = (screen_height - window_height) // 2
 window.geometry(f"{window_width}x{window_height}+{x_position}+{y_position}")
-lab1=tk.Label(window,cursor='hand2',borderwidth=1,relief='solid',width=12,height=6)
-lab1.grid(row=0,column=0)
-lab1.bind('<Button-1>',lambda event:oo(lab1))
-lab2=tk.Label(window,cursor='hand2',borderwidth=1,relief='solid',width=12,height=6)
-lab2.grid(row=0,column=1)
-lab2.bind('<Button-1>',lambda event:oo(lab2))
-lab3=tk.Label(window,cursor='hand2',borderwidth=1,relief='solid',width=12,height=6)
-lab3.grid(row=0,column=2)
-lab3.bind('<Button-1>',lambda event:oo(lab3))
-lab4=tk.Label(window,cursor='hand2',borderwidth=1,relief='solid',width=12,height=6)
-lab4.grid(row=1,column=0)
-lab4.bind('<Button-1>',lambda event:oo(lab4))
-lab5=tk.Label(window,cursor='hand2',borderwidth=1,relief='solid',width=12,height=6)
-lab5.grid(row=1,column=1)
-lab5.bind('<Button-1>',lambda event:oo(lab5))
-lab6=tk.Label(window,cursor='hand2',borderwidth=1,relief='solid',width=12,height=6)
-lab6.grid(row=1,column=2)
-lab6.bind('<Button-1>',lambda event:oo(lab6))
-lab7=tk.Label(window,cursor='hand2',borderwidth=1,relief='solid',width=12,height=6)
-lab7.grid(row=2,column=0)
-lab7.bind('<Button-1>',lambda event:oo(lab7))
-lab8=tk.Label(window,cursor='hand2',borderwidth=1,relief='solid',width=12,height=6)
-lab8.grid(row=2,column=1)
-lab8.bind('<Button-1>',lambda event:oo(lab8))
-lab9=tk.Label(window,cursor='hand2',borderwidth=1,relief='solid',width=12,height=6)
-lab9.grid(row=2,column=2)
-lab9.bind('<Button-1>',lambda event:oo(lab9))
+labels = []  # 레이블 객체를 저장하는 리스트
+clicked=set()
+def check_winner(player):
+    win_conditions = [
+        [labels[0], labels[1], labels[2]],  # 가로 1줄
+        [labels[3], labels[4], labels[5]],  # 가로 2줄
+        [labels[6], labels[7], labels[8]],  # 가로 3줄
+        [labels[0], labels[3], labels[6]],  # 세로 1줄
+        [labels[1], labels[4], labels[7]],  # 세로 2줄
+        [labels[2], labels[5], labels[8]],  # 세로 3줄
+        [labels[0], labels[4], labels[8]],  # 대각선 ↘
+        [labels[2], labels[4], labels[6]]   # 대각선 ↙
+    ]
+    
+    for condition in win_conditions:
+        if all(label.cget("text") == player for label in condition):  
+            return True
+    return False
+
+def oo(ko):
+    if ko in clicked:return  # 리스트에서 제거 (존재할 때만)
+    
+    
+    ko.config(text='o')  # 클릭한 레이블은 'o'로 변경
+    clicked.add(ko)
+    remain=[l for l in labels if l not in clicked]
+    if remain:  # 리스트에 남은 레이블이 있다면
+        chosen=random.choice(remain)
+        chosen.config(text='x')  # 무작위 레이블을 선택해 'x'로 변경
+        clicked.add(chosen)
+    if check_winner('o'):
+        print('win')
+        mbox.showinfo('result','YOU WIN!')
+    elif check_winner('x'):mbox.showinfo('result','YOU LOSE.T.T')
+for i in range(3):
+    for j in range(3):
+        label = tk.Label(window, cursor='hand2', borderwidth=1, relief='solid', width=12, height=6)
+        label.grid(row=i, column=j)
+        label.bind('<Button-1>', lambda event, l=label: oo(l))  # 클릭 이벤트 바인딩
+        labels.append(label)  # 리스트에 레이블 추가
 window.mainloop()
